@@ -87,8 +87,10 @@ namespace ApxLabs.FastAndroidCamera
 		{
 			unsafe
 			{
-				// tell Java that we're done with this array
-				JniEnvEx.ReleaseByteArrayElements(Handle, Raw, IsReadOnly ? PrimitiveArrayReleaseMode.Release : PrimitiveArrayReleaseMode.CommitAndRelease);
+				if (disposing) {
+					// tell Java that we're done with this array
+					JniEnvEx.ReleaseByteArrayElements(Handle, Raw, IsReadOnly ? PrimitiveArrayReleaseMode.Release : PrimitiveArrayReleaseMode.CommitAndRelease);
+				}
 			}
 			base.Dispose(disposing);
 		}
