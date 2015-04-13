@@ -1,0 +1,65 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.axml text
+*.bas text
+*.c text diff=cpp
+*.cc text diff=cpp
+*.cpp text diff=cpp
+*.cxx text diff=cpp
+*.cs text diff=csharp
+*.h text diff=cpp
+*.hh text diff=cpp
+*.hpp text diff=cpp
+*.htm text diff=html
+*.html text diff=html
+*.hxx text diff=cpp
+*.java text diff=java
+*.js text
+*.jsp text
+Makefile text
+*.m text diff=objc
+*.mk text
+*.php text diff=php
+*.php5 text diff=php
+*.pl text diff=perl
+*.pm text
+*.py text diff=python
+*.xhtml diff=html
+*.xml text
+
+# Declare files that will always have LF line endings on checkout.
+*.sh text eol=lf
+
+# Declare files that will always have CRLF line endings on checkout.
+*.csproj text eol=crlf
+*.dsp text eol=crlf
+*.dsw text eol=crlf
+*.projitems text eol=crlf
+*.ps1 text eol=crlf
+*.rc text eol=crlf
+*.rc2 text eol=crlf
+*.shproj text eol=crlf
+*.sln text eol=crlf
+*.vb text eol=crlf
+*.vbproj text eol=crlf
+*.vcxproj text eol=crlf
+*.vdproj text eol=crlf
+app.config text eol=crlf
+packages.config text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.gif binary
+*.icns binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.ktx binary
+*.pdf binary
+*.png binary
+*.pvr binary
+*.tif binary
+*.tiff binary
+*.ttf binary
