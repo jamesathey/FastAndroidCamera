@@ -1,6 +1,6 @@
 # FastAndroidCamera
 
-Xamarin's' default wrapping strategy to generate the C# bindings to the Android SDK works well in most cases. The
+Xamarin's default wrapping strategy to generate the C# bindings to the Android SDK works well in most cases. The
 <a href="https://developer.android.com/reference/android/hardware/Camera.html">Android.Hardware.Camera API</a> is
 **not** one of those cases.
 
