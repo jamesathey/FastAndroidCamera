@@ -79,9 +79,12 @@ namespace ApxLabs.FastAndroidCamera
 
 		protected override void Dispose(bool disposing)
 		{
-			if (class_ref != IntPtr.Zero)
-				JNIEnv.DeleteGlobalRef(class_ref);
-			class_ref = IntPtr.Zero;
+			if (disposing) {
+				if (class_ref != IntPtr.Zero) {
+					JNIEnv.DeleteGlobalRef(class_ref);
+				}
+				class_ref = IntPtr.Zero;
+			}
 			base.Dispose(disposing);
 		}
 
