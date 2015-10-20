@@ -42,8 +42,15 @@ void StartCamera()
 	int numBytes = (parameters.PreviewSize.Width * parameters.PreviewSize.Height * ImageFormat.GetBitsPerPixel(parameters.PreviewFormat)) / 8;
 	for (uint i = 0; i < NUM_PREVIEW_BUFFERS; ++i)
 	{
-		// allocate new Java byte arrays for Android to use for preview frames
-		camera.AddCallbackBuffer(new FastJavaByteArray(numBytes));
+		using (FastJavaByteArray buffer = new FastJavaByteArray(numBytes))
+		{
+			// allocate new Java byte arrays for Android to use for preview frames
+			camera.AddCallbackBuffer(new FastJavaByteArray(numBytes));
+		}
+		// The using block automatically calls Dispose() on the buffer, which is safe
+		// because it does not automaticaly destroy the Java byte array. It only releases
+		// our JNI reference to that array; the Android Camera (in Java land) still
+		// has its own reference to the array.
 	}
 
 	// non-marshaling version of the preview callback
@@ -53,23 +60,29 @@ void StartCamera()
 public void OnPreviewFrame(IntPtr data, SdkCamera camera)
 {
 	// Wrap the JNI reference to the Java byte array
-	FastJavaByteArray buffer = new FastJavaByteArray(data);
-
-	// Get individual bytes
-	byte firstByte = buffer[0];
-	byte lastByte = buffer[buffer.Count - 1];
-
-	// Iterate over it
-	foreach (byte b in buffer)
+	using(FastJavaByteArray buffer = new FastJavaByteArray(data))
 	{
-		// access one at a time
+		// Get individual bytes
+		byte firstByte = buffer[0];
+		byte lastByte = buffer[buffer.Count - 1];
+
+		// Iterate over it
+		foreach (byte b in buffer)
+		{
+			// access one at a time
+		}
+
+		// Pass it to native APIs
+		myNativeBytePointerMethod(buffer.Raw, buffer.Count);
+
+		// reuse the Java byte array; return it to the Camera API
+		camera.AddCallbackBuffer(buffer);
+		
+		// Don't do anything else with the buffer at this point - it now "belongs" to
+		// Android, and the Camera could overwrite the data at any time.
 	}
-
-	// Pass it to native APIs
-	myNativeBytePointerMethod(buffer.Raw, buffer.Count);
-
-	// reuse the Java byte array; return it to the Camera API
-	camera.AddCallbackBuffer(buffer);
+	// The end of the using() block calls Dispose() on the buffer, releasing our JNI
+	// reference to the array
 }
 ```
 
