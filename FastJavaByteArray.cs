@@ -53,9 +53,8 @@ namespace ApxLabs.FastAndroidCamera
 			unsafe
 			{
 				// Get the pointer to the byte array using the global Handle
-				Raw = JniEnvEx.GetByteArrayElements(Handle, ref isCopy);
+				Raw = JniEnvEx.GetByteArrayElements(Handle, isCopy);
 			}
-
 		}
 
 		/// <summary>
@@ -63,7 +62,7 @@ namespace ApxLabs.FastAndroidCamera
 		/// </summary>
 		/// <param name="handle">Native Java array handle</param>
 		/// <param name="readOnly">Whether to consider this byte array read-only</param>
-		public FastJavaByteArray(IntPtr handle, bool readOnly=true) : base(handle, JniHandleOwnership.DoNotTransfer)
+		public FastJavaByteArray(IntPtr handle, bool readOnly = true) : base(handle, JniHandleOwnership.DoNotTransfer)
 		{
 			// DoNotTransfer is used to leave the incoming handle alone; that reference was created in Java, so it's
 			// Java's responsibility to delete it. DoNotTransfer creates a global reference to use here in the CLR
@@ -77,7 +76,7 @@ namespace ApxLabs.FastAndroidCamera
 			unsafe
 			{
 				// Get the pointer to the byte array using the global Handle
-				Raw = JniEnvEx.GetByteArrayElements(Handle, ref isCopy);
+				Raw = JniEnvEx.GetByteArrayElements(Handle, isCopy);
 			}
 		}
 
