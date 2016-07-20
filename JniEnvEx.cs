@@ -22,26 +22,26 @@ using Java.Interop;
 namespace ApxLabs.FastAndroidCamera
 {
 	public enum PrimitiveArrayReleaseMode {
-        CommitAndRelease = 0,
-        Commit = 1,
-        Release = 2
-    }
+		CommitAndRelease = 0,
+		Commit = 1,
+		Release = 2
+	}
 
-    public static class JniEnvEx
-    {
-        public static IntPtr NewByteArray(int length)
-        {
-            return JniEnvironment.Arrays.NewByteArray(length).Handle;
-        }
+	public static class JniEnvEx
+	{
+		public static IntPtr NewByteArray(int length)
+		{
+			return JniEnvironment.Arrays.NewByteArray(length).Handle;
+		}
 
-        public static unsafe byte* GetByteArrayElements(IntPtr array, bool isCopy)
-        {
-            return (byte*)JniEnvironment.Arrays.GetByteArrayElements(new JniObjectReference(array, JniObjectReferenceType.Global), &isCopy);
-        }
+		public static unsafe byte* GetByteArrayElements(IntPtr array, bool isCopy)
+		{
+			return (byte*)JniEnvironment.Arrays.GetByteArrayElements(new JniObjectReference(array, JniObjectReferenceType.Global), &isCopy);
+		}
 
-        public static unsafe void ReleaseByteArrayElements(IntPtr array, byte* elements, PrimitiveArrayReleaseMode mode)
-        {
-            JniEnvironment.Arrays.ReleaseByteArrayElements(new JniObjectReference(array, JniObjectReferenceType.Global), (sbyte*)elements, (JniReleaseArrayElementsMode)mode);
-        }
-    }
+		public static unsafe void ReleaseByteArrayElements(IntPtr array, byte* elements, PrimitiveArrayReleaseMode mode)
+		{
+			JniEnvironment.Arrays.ReleaseByteArrayElements(new JniObjectReference(array, JniObjectReferenceType.Global), (sbyte*)elements, (JniReleaseArrayElementsMode)mode);
+		}
+	}
 }
