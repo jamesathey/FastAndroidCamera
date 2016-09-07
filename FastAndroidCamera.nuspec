@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>FastAndroidCamera</id>
+    <version>2.0.0</version>
+    <title>FastAndroidCamera</title>
+    <authors>James Athey</authors>
+    <owners>APX Labs, Inc.</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://github.com/jamesathey/FastAndroidCamera</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Camera preview callbacks with less overhead on Xamarin.Android.</summary>
+    <description>FastAndroidCamera makes it possible to use the Android.Hardware.Camera API as efficiently in C# as using the underlying android.hardware.Camera API in Java. No additional byte arrays are created, and no additional buffer copies are needed.</description>
+    <copyright>Copyright 2015-2016</copyright>
+    <releaseNotes>Uses new Java.Interop.JniEnvironment APIs; now requires Xamarin 6.1 or later.</releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin/Release/FastAndroidCamera.dll" target="lib/MonoAndroid403" />
+    <file src="bin/Release/FastAndroidCamera.xml" target="lib/MonoAndroid403" />
+    <file src="*.cs" target="src" />
+  </files>
+</package>
