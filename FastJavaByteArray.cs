@@ -14,21 +14,22 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-using System.Runtime.InteropServices;
-using Android.Runtime;
-using System.Collections.Generic;
 using System;
-using System.Diagnostics;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Java.Interop;
 
 namespace ApxLabs.FastAndroidCamera
 {
 	/// <summary>
-	/// A wrapper around a Java array that reads elements directly from the pointer instead of through
-	/// expensive JNI calls.
+	/// A wrapper around a Java array that reads elements directly from the pointer instead of through expensive JNI calls.
 	/// </summary>
-	public sealed class FastJavaByteArray : Java.Lang.Object, IList<byte>
+	public sealed class FastJavaByteArray : IList<byte>, IDisposable
 	{
+		private JniObjectReference _javaRef;
+
 		#region Constructors
 
 		/// <summary>
@@ -40,22 +41,20 @@ namespace ApxLabs.FastAndroidCamera
 			if (length <= 0)
 				throw new ArgumentOutOfRangeException();
 
-			IntPtr arrayHandle = JniEnvEx.NewByteArray(length);
-			if (arrayHandle == IntPtr.Zero)
+			JniObjectReference localRef = JniEnvironment.Arrays.NewByteArray(length);
+			if (!localRef.IsValid)
 				throw new OutOfMemoryException();
 
-			// Retain a global reference to the byte array. NewByteArray() returns a local ref, and TransferLocalRef
-			// creates a new global ref to the array and deletes the local ref.
-			SetHandle(arrayHandle, JniHandleOwnership.TransferLocalRef);
+			// Retain a global reference to the byte array.
+			_javaRef = localRef.NewGlobalRef();
 			Count = length;
 
 			bool isCopy = false;
 			unsafe
 			{
 				// Get the pointer to the byte array using the global Handle
-				Raw = JniEnvEx.GetByteArrayElements(Handle, ref isCopy);
+				Raw = (byte*)JniEnvironment.Arrays.GetByteArrayElements(_javaRef, &isCopy);
 			}
-
 		}
 
 		/// <summary>
@@ -63,37 +62,71 @@ namespace ApxLabs.FastAndroidCamera
 		/// </summary>
 		/// <param name="handle">Native Java array handle</param>
 		/// <param name="readOnly">Whether to consider this byte array read-only</param>
-		public FastJavaByteArray(IntPtr handle, bool readOnly=true) : base(handle, JniHandleOwnership.DoNotTransfer)
+		public FastJavaByteArray(IntPtr handle, bool readOnly = true)
 		{
-			// DoNotTransfer is used to leave the incoming handle alone; that reference was created in Java, so it's
-			// Java's responsibility to delete it. DoNotTransfer creates a global reference to use here in the CLR
 			if (handle == IntPtr.Zero)
 				throw new ArgumentNullException("handle");
 
 			IsReadOnly = readOnly;
 
-			Count = JNIEnv.GetArrayLength(Handle);
+			// Retain a global reference to the byte array.
+			_javaRef = new JniObjectReference(handle).NewGlobalRef();
+			Count = JniEnvironment.Arrays.GetArrayLength(_javaRef);
+
 			bool isCopy = false;
 			unsafe
 			{
-				// Get the pointer to the byte array using the global Handle
-				Raw = JniEnvEx.GetByteArrayElements(Handle, ref isCopy);
+				// Get a pinned pointer to the byte array using the global Handle
+				Raw = (byte*)JniEnvironment.Arrays.GetByteArrayElements(_javaRef, &isCopy);
 			}
 		}
 
 		#endregion
 
-		protected override void Dispose(bool disposing)
+		#region Dispose Pattern
+
+		/// <summary>
+		/// Releases unmanaged resources and performs other cleanup operations before the
+		/// <see cref="T:ApxLabs.FastAndroidCamera.FastJavaByteArray"/> is reclaimed by garbage collection.
+		/// </summary>
+		~FastJavaByteArray()
 		{
+			Dispose(false);
+		}
+
+		/// <summary>
+		/// Releases all resource used by the <see cref="T:ApxLabs.FastAndroidCamera.FastJavaByteArray"/> object.
+		/// </summary>
+		/// <remarks>Call <see cref="Dispose"/> when you are finished using the
+		/// <see cref="T:ApxLabs.FastAndroidCamera.FastJavaByteArray"/>. The <see cref="Dispose"/> method leaves the
+		/// <see cref="T:ApxLabs.FastAndroidCamera.FastJavaByteArray"/> in an unusable state. After calling
+		/// <see cref="Dispose"/>, you must release all references to the
+		/// <see cref="T:ApxLabs.FastAndroidCamera.FastJavaByteArray"/> so the garbage collector can reclaim the memory that
+		/// the <see cref="T:ApxLabs.FastAndroidCamera.FastJavaByteArray"/> was occupying.</remarks>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposing)
+		{
+			if (!_javaRef.IsValid)
+				return;
+
 			unsafe
 			{
-				if (Raw != null)
-					// tell Java that we're done with this array
-					JniEnvEx.ReleaseByteArrayElements(Handle, Raw, IsReadOnly ? PrimitiveArrayReleaseMode.Release : PrimitiveArrayReleaseMode.CommitAndRelease);
-				Raw = null;
+				// tell Java that we're done with this array
+				JniEnvironment.Arrays.ReleaseByteArrayElements(_javaRef, (sbyte*)Raw, JniReleaseArrayElementsMode.Default);
 			}
-			base.Dispose(disposing);
+
+			if (disposing)
+			{
+				JniObjectReference.Dispose(ref _javaRef);
+			}
 		}
+
+		#endregion
 
 		#region IList<byte> Properties
 
@@ -268,9 +301,18 @@ namespace ApxLabs.FastAndroidCamera
 		#region Public Properties
 
 		/// <summary>
-		/// Get the raw pointer to the underlying data.
+		/// Gets the raw pointer to the underlying data.
 		/// </summary>
 		public unsafe byte* Raw { get; private set; }
+
+		/// <summary>
+		/// Gets the handle of the Java reference to the array.
+		/// </summary>
+		/// <value>The handle.</value>
+		public IntPtr Handle
+		{
+			get { return _javaRef.Handle; }
+		}
 
 		#endregion
 	}

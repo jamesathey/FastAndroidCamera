@@ -60,12 +60,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraExtensions.cs" />
-    <Compile Include="JniEnvEx.cs" />
     <Compile Include="FastJavaByteArray.cs" />
     <Compile Include="FastJavaByteArrayEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
