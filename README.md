@@ -45,7 +45,7 @@ void StartCamera()
 		using (FastJavaByteArray buffer = new FastJavaByteArray(numBytes))
 		{
 			// allocate new Java byte arrays for Android to use for preview frames
-			camera.AddCallbackBuffer(new FastJavaByteArray(numBytes));
+			camera.AddCallbackBuffer(buffer);
 		}
 		// The using block automatically calls Dispose() on the buffer, which is safe
 		// because it does not automaticaly destroy the Java byte array. It only releases
